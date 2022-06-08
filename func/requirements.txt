@@ -1,0 +1,9 @@
+--extra-index-url https://backend:<FILL_PASSWORD_HERE>@nexus.sigame.com.br/repository/pypi/simple
+asgiref==3.5.2
+boto3==1.21.21
+flask==2.1.2
+heimdall-client==2.2.0
+motor==3.0.0
+persephone-client==1.3.1
+pip-chill==1.0.1
+strenum==0.4.7
