@@ -1,6 +1,6 @@
 # Jormungandr - Onboarding
 from src.domain.enums.code import InternalCode
-from src.domain.exceptions import ErrorOnSendAuditLog, ErrorOnDecodeJwt
+from src.domain.exceptions import ErrorOnSendAuditLog, ErrorOnDecodeJwt, SelfieNotExists
 from src.domain.response.model import ResponseModel
 from src.domain.validator import Base64
 from src.services.jwt import JwtService
@@ -36,6 +36,13 @@ async def selfie():
         ).build_http_response(status=HTTPStatus.UNAUTHORIZED)
         return response
 
+    except SelfieNotExists as ex:
+        Gladsheim.error(error=ex, message=ex.msg)
+        response = ResponseModel(
+            success=False, code=InternalCode.DATA_NOT_FOUND, message=msg_error
+        ).build_http_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        return response
+
     except ErrorOnSendAuditLog as ex:
         Gladsheim.error(error=ex, message=ex.msg)
         response = ResponseModel(
@@ -48,7 +55,7 @@ async def selfie():
         response = ResponseModel(
             success=False,
             code=InternalCode.INVALID_PARAMS,
-            message="Invalid base64"
+            message="Invalid base64 string"
         ).build_http_response(status=HTTPStatus.BAD_REQUEST)
         return response
 
