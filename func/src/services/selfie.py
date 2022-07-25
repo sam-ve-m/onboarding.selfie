@@ -9,6 +9,9 @@ from base64 import b64decode
 from io import SEEK_SET
 from tempfile import TemporaryFile
 
+# Third party
+from decouple import config
+
 
 class SelfieService:
 
@@ -25,13 +28,13 @@ class SelfieService:
     async def _resolve_content(selfie_validated: dict) -> TemporaryFile:
         content = selfie_validated.get("content")
         decoded_selfie = b64decode(content)
-        with TemporaryFile() as temp_file:
-            temp_file.write(decoded_selfie)
-            temp_file.seek(SEEK_SET)
-            return temp_file
+        temp_file = TemporaryFile()
+        temp_file.write(decoded_selfie)
+        temp_file.seek(SEEK_SET)
+        return temp_file
 
     @staticmethod
     async def _content_exists(file_path: str):
         content_result = await FileRepository.list_contents(file_path=file_path)
-        if content_result is None or "Contents" not in content_result:
+        if content_result is None or config("CONTENTS") not in content_result:
             raise SelfieNotExists

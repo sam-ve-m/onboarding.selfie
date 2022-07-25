@@ -11,15 +11,15 @@ from http import HTTPStatus
 
 # Third party
 from etria_logger import Gladsheim
-from flask import request
+from flask import request, Response
 
 
-async def selfie():
+async def selfie() -> Response:
     raw_selfie = request.json
     jwt = request.headers.get("x-thebes-answer")
-    unique_id = await JwtService.decode_jwt_and_get_unique_id(jwt=jwt)
     msg_error = "Unexpected error occurred"
     try:
+        unique_id = await JwtService.decode_jwt_and_get_unique_id(jwt=jwt)
         selfie_validated = Base64(**raw_selfie).dict()
         success = await SelfieService.save_user_selfie(selfie_validated=selfie_validated, unique_id=unique_id)
         response = ResponseModel(
@@ -40,7 +40,7 @@ async def selfie():
         Gladsheim.error(error=ex, message=ex.msg)
         response = ResponseModel(
             success=False, code=InternalCode.DATA_NOT_FOUND, message=msg_error
-        ).build_http_response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        ).build_http_response(status=HTTPStatus.BAD_REQUEST)
         return response
 
     except ErrorOnSendAuditLog as ex:
@@ -55,7 +55,7 @@ async def selfie():
         response = ResponseModel(
             success=False,
             code=InternalCode.INVALID_PARAMS,
-            message="Invalid base64 string"
+            message="Invalid, extra or missing params"
         ).build_http_response(status=HTTPStatus.BAD_REQUEST)
         return response
 
