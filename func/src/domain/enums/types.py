@@ -18,3 +18,7 @@ class UserFileType(StrEnum):
 
 class FileExtensionType(StrEnum):
     SELFIE_EXTENSION = ".jpg"
+
+
+class UserOnboardingStep(StrEnum):
+    SELFIE = "selfie"

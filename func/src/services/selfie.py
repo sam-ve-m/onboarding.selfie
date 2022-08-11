@@ -1,8 +1,9 @@
 # Jormungandr - Onboarding
-from ..domain.enums.types import UserFileType, FileExtensionType
-from ..domain.exceptions import SelfieNotExists
+from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep
+from ..domain.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
 from ..repositories.s3.repository import FileRepository
 from ..transports.audit.transport import Audit
+from ..transports.onboarding_steps.transport import OnboardingSteps
 
 # Standards
 from base64 import b64decode
@@ -14,11 +15,19 @@ from decouple import config
 
 
 class SelfieService:
+    @staticmethod
+    async def validate_current_onboarding_step(jwt: str) -> bool:
+        user_current_step = await OnboardingSteps.get_user_current_step(jwt=jwt)
+        if not user_current_step == UserOnboardingStep.SELFIE:
+            raise InvalidOnboardingCurrentStep
+        return True
 
     @staticmethod
     async def save_user_selfie(selfie_validated: dict, unique_id: str):
         file_path = f"{unique_id}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
-        temp_file = await SelfieService._resolve_content(selfie_validated=selfie_validated)
+        temp_file = await SelfieService._resolve_content(
+            selfie_validated=selfie_validated
+        )
         await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
         await SelfieService._content_exists(file_path=file_path)
         await Audit.register_log(file_path=file_path, unique_id=unique_id)

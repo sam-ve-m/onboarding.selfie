@@ -68,4 +68,6 @@ spec:
               value: "dtvm-terms-dev"
             - name: REGION_NAME
               value: "sa-east-1"
+            - name: ONBOARDING_STEPS_BR_URL
+              value: "router.fission.svc.cluster.local/onboarding/steps_br"
   version: 2
