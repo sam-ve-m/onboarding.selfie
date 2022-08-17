@@ -31,7 +31,7 @@ class SelfieService:
         )
         await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
         await SelfieService._content_exists(file_path=file_path)
-        await Audit.send_log(file_path=file_path, unique_id=unique_id)
+        await Audit.record_message_log(file_path=file_path, unique_id=unique_id)
         return True
 
     @staticmethod

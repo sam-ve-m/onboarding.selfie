@@ -12,7 +12,7 @@ class JwtService:
     @staticmethod
     async def decode_jwt_and_get_unique_id(jwt: str):
         jwt_content, heimdall_status_response = await Heimdall.decode_payload(jwt=jwt)
-        if not HeimdallStatusResponses.SUCCESS == heimdall_status_response:
+        if not HeimdallStatusResponses.SUCCESS.value == heimdall_status_response.value:
             raise ErrorOnDecodeJwt
         unique_id = jwt_content.get("decoded_jwt", {}).get("user", {}).get("unique_id")
         if not unique_id:

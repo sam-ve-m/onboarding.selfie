@@ -11,7 +11,7 @@ class Audit:
     audit_client = Persephone
 
     @classmethod
-    async def send_log(cls, unique_id: str, file_path: str):
+    async def record_message_log(cls, unique_id: str, file_path: str):
         message = {
             "unique_id": unique_id,
             "file_path": file_path,

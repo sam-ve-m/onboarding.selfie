@@ -5,7 +5,7 @@ from func.src.domain.exceptions.exceptions import (
     InvalidOnboardingCurrentStep,
 )
 from func.src.services.selfie import SelfieService
-from tests.src.stubs import stub_content, stub_unique_id, stub_b64_file
+from tests.src.services.selfie.stubs import stub_content, stub_unique_id, stub_b64_file
 
 # Standards
 from unittest.mock import patch
@@ -64,7 +64,7 @@ async def test_when_image_as_str_then_return_temp_file():
 
 
 @pytest.mark.asyncio
-@patch("func.src.services.selfie.Audit.send_log")
+@patch("func.src.services.selfie.Audit.record_message_log")
 @patch.object(SelfieService, "_content_exists")
 @patch("func.src.services.selfie.FileRepository.save_user_file")
 async def test_when_valid_unique_id_and_selfie_then_return_true(
@@ -78,7 +78,7 @@ async def test_when_valid_unique_id_and_selfie_then_return_true(
 
 
 @pytest.mark.asyncio
-@patch("func.src.services.selfie.Audit.send_log")
+@patch("func.src.services.selfie.Audit.record_message_log")
 @patch.object(SelfieService, "_content_exists")
 @patch("func.src.services.selfie.FileRepository.save_user_file")
 async def test_when_valid_unique_id_and_selfie_then_mocks_was_called(

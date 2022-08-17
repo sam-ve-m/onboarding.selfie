@@ -19,7 +19,7 @@ class OnboardingSteps:
             )
             if not request_result.status_code == HTTPStatus.OK:
                 raise OnboardingStepsStatusCodeNotOk
-            user_current_step = (
-                request_result.json().get("result", {}).get("current_step")
-            )
+        user_current_step = (
+            request_result.json().get("result", {}).get("current_step")
+        )
         return user_current_step
