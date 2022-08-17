@@ -1,5 +1,5 @@
 # Jormungandr - Onboarding
-from ...domain.exceptions import OnboardingStepsStatusCodeNotOk
+from ...domain.exceptions.exceptions import OnboardingStepsStatusCodeNotOk
 
 # Standards
 from http import HTTPStatus

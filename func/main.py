@@ -1,6 +1,6 @@
 # Jormungandr - Onboarding
 from src.domain.enums.code import InternalCode
-from src.domain.exceptions import (
+from src.domain.exceptions.exceptions import (
     ErrorOnSendAuditLog,
     ErrorOnDecodeJwt,
     SelfieNotExists,
@@ -9,7 +9,7 @@ from src.domain.exceptions import (
     ErrorOnGetUniqueId,
 )
 from src.domain.response.model import ResponseModel
-from src.domain.validator import Base64
+from src.domain.validators.validator import Base64File
 from src.services.jwt import JwtService
 from src.services.selfie import SelfieService
 
@@ -27,7 +27,7 @@ async def selfie() -> Response:
     msg_error = "Unexpected error occurred"
     try:
         unique_id = await JwtService.decode_jwt_and_get_unique_id(jwt=jwt)
-        selfie_validated = Base64(**raw_selfie).dict()
+        selfie_validated = Base64File(**raw_selfie)
         await SelfieService.validate_current_onboarding_step(jwt=jwt)
         success = await SelfieService.save_user_selfie(
             selfie_validated=selfie_validated, unique_id=unique_id

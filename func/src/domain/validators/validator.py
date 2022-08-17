@@ -5,7 +5,7 @@ from pydantic import BaseModel, validator
 from re import match
 
 
-class Base64(BaseModel):
+class Base64File(BaseModel):
     content: str
 
     @validator("content", always=True, allow_reuse=True)

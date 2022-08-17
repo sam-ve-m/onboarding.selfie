@@ -1,6 +1,7 @@
 # Jormungandr - Onboarding
 from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep
-from ..domain.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
+from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
+from ..domain.validators.validator import Base64File
 from ..repositories.s3.repository import FileRepository
 from ..transports.audit.transport import Audit
 from ..transports.onboarding_steps.transport import OnboardingSteps
@@ -23,19 +24,19 @@ class SelfieService:
         return True
 
     @staticmethod
-    async def save_user_selfie(selfie_validated: dict, unique_id: str):
+    async def save_user_selfie(selfie_validated: Base64File, unique_id: str) -> bool:
         file_path = f"{unique_id}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
         temp_file = await SelfieService._resolve_content(
             selfie_validated=selfie_validated
         )
         await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
         await SelfieService._content_exists(file_path=file_path)
-        await Audit.register_log(file_path=file_path, unique_id=unique_id)
+        await Audit.send_log(file_path=file_path, unique_id=unique_id)
         return True
 
     @staticmethod
-    async def _resolve_content(selfie_validated: dict) -> TemporaryFile:
-        content = selfie_validated.get("content")
+    async def _resolve_content(selfie_validated: Base64File) -> TemporaryFile:
+        content = selfie_validated.content
         decoded_selfie = b64decode(content)
         temp_file = TemporaryFile()
         temp_file.write(decoded_selfie)
@@ -43,7 +44,8 @@ class SelfieService:
         return temp_file
 
     @staticmethod
-    async def _content_exists(file_path: str):
+    async def _content_exists(file_path: str) -> bool:
         content_result = await FileRepository.list_contents(file_path=file_path)
         if content_result is None or config("CONTENTS") not in content_result:
             raise SelfieNotExists
+        return True

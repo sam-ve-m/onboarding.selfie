@@ -1,5 +1,5 @@
 # Jormungandr - Onboarding
-from ...domain.exceptions import ErrorOnSendAuditLog
+from ...domain.exceptions.exceptions import ErrorOnSendAuditLog
 from ...domain.enums.types import QueueTypes
 
 # Third party
@@ -11,7 +11,7 @@ class Audit:
     audit_client = Persephone
 
     @classmethod
-    async def register_log(cls, unique_id: str, file_path: str):
+    async def send_log(cls, unique_id: str, file_path: str):
         message = {
             "unique_id": unique_id,
             "file_path": file_path,
