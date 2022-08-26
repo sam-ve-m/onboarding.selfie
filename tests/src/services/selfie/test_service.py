@@ -19,6 +19,16 @@ import pytest
 @patch(
     "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
 )
+async def test_when_content_exists_then_return_true(mock_list_contents):
+    result = await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
+
+    assert result is True
+
+
+@pytest.mark.asyncio
+@patch(
+    "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
+)
 async def test_when_content_exists_then_proceed(mock_list_contents):
     await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 

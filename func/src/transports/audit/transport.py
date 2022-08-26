@@ -30,3 +30,4 @@ class Audit:
         )
         if not success:
             raise ErrorOnSendAuditLog
+        return True
