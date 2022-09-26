@@ -18,7 +18,7 @@ spec:
     container:
       name: ""
       resources: {}
-    image: nexus.sigame.com.br/fission-async:0.1.6
+    image: nexus.sigame.com.br/fission-async:0.1.7
     podspec:
       containers:
         - name: selfie-env
