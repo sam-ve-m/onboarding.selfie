@@ -1,5 +1,6 @@
 payload_b64_file = {
     "device_info": {
+        "device_id": "IDDDDDD",
         "device_name": "Android SDK built for x86",
         "device_model": "Android SDK built for x86",
         "is_emulator": True,
