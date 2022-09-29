@@ -51,5 +51,5 @@ spec:
     packageref:
       name: selfie-fn-4504a06d-6767-415f-9c21-e9a5fb595e81
       namespace: default
-  requestsPerPod: 1
+  requestsPerPod: 10000
   resources: {}
