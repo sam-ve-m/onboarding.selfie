@@ -6,6 +6,7 @@ from func.src.domain.exceptions.exceptions import (
 )
 from func.src.services.selfie import SelfieService
 from func.src.transports.bureau_validation.transport import BureauApiTransport
+from func.src.repositories.mongo_db.user.repository import UserRepository
 from tests.src.services.selfie.stubs import stub_content, stub_unique_id, stub_b64_file
 
 # Standards
@@ -79,8 +80,9 @@ async def test_when_image_as_str_then_return_temp_file():
 @patch.object(SelfieService, "_content_exists")
 @patch("func.src.services.selfie.FileRepository.save_user_file")
 @patch.object(BureauApiTransport, "create_transaction")
+@patch.object(UserRepository, "update_one")
 async def test_when_valid_unique_id_and_selfie_then_return_true(
-    mock_validate_file, mock_save_file, mock_content_exists, mock_register_log
+    mocked_repo, mock_validate_file, mock_save_file, mock_content_exists, mock_register_log
 ):
     success = await SelfieService.save_user_selfie(
         selfie_validated=stub_b64_file, unique_id=stub_unique_id
@@ -94,8 +96,9 @@ async def test_when_valid_unique_id_and_selfie_then_return_true(
 @patch.object(SelfieService, "_content_exists")
 @patch("func.src.services.selfie.FileRepository.save_user_file")
 @patch.object(BureauApiTransport, "create_transaction")
+@patch.object(UserRepository, "update_one")
 async def test_when_valid_unique_id_and_selfie_then_mocks_was_called(
-    mock_validate_file, mock_save_file, mock_content_exists, mock_register_log
+    mocked_repo, mock_validate_file, mock_save_file, mock_content_exists, mock_register_log
 ):
     await SelfieService.save_user_selfie(
         selfie_validated=stub_b64_file, unique_id=stub_unique_id

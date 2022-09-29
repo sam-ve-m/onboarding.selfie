@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from src.domain.enums.types import CpfValidationStatus
 from src.domain.validators.validator import DeviceInformation
 
 
@@ -24,3 +25,9 @@ class Selfie:
         }
         return template
 
+    @staticmethod
+    def user_template() -> dict:
+        template = {
+            "bureau_validations.score": CpfValidationStatus.QUEUED.value,
+        }
+        return template

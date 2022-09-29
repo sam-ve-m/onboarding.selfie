@@ -3,6 +3,7 @@ from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboarding
 from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
 from ..domain.models.selfie import Selfie
 from ..domain.validators.validator import Base64File
+from ..repositories.mongo_db.user.repository import UserRepository
 from ..repositories.s3.repository import FileRepository
 from ..transports.audit.transport import Audit
 from ..transports.bureau_validation.transport import BureauApiTransport
@@ -40,6 +41,7 @@ class SelfieService:
         await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
         await SelfieService._content_exists(file_path=file_path)
         await BureauApiTransport.create_transaction(selfie=selfie)
+        await UserRepository.update_one(unique_id=unique_id, update=selfie.user_template())
         return True
 
     @staticmethod
