@@ -105,10 +105,7 @@ async def test_when_valid_unique_id_and_selfie_then_mocks_was_called(
     mock_content_exists.assert_called_once_with(
         file_path=f"{stub_unique_id}/user_selfie/user_selfie.jpg"
     )
-    mock_register_log.assert_called_once_with(
-        file_path=f"{stub_unique_id}/user_selfie/user_selfie.jpg",
-        unique_id=stub_unique_id,
-    )
+    mock_register_log.assert_called_once()
 
 
 @pytest.mark.asyncio
