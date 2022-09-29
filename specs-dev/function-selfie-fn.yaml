@@ -1,0 +1,55 @@
+include:
+- ./func/*
+kind: ArchiveUploadSpec
+name: func-wpDc
+
+---
+apiVersion: fission.io/v1
+kind: Package
+metadata:
+  creationTimestamp: null
+  name: selfie-fn-ad366824-de0f-4c5a-80a7-705d2e7b5764
+  namespace: default
+spec:
+  deployment:
+    checksum: {}
+  environment:
+    name: selfie-env
+    namespace: default
+  source:
+    checksum: {}
+    type: url
+    url: archive://func-wpDc
+status:
+  buildstatus: pending
+  lastUpdateTimestamp: "2022-07-25T17:53:07Z"
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: selfie-fn
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: newdeploy
+      MaxScale: 3
+      MinScale: 1
+      SpecializationTimeout: 120
+      TargetCPUPercent: 80
+    StrategyType: execution
+  concurrency: 500
+  environment:
+    name: selfie-env
+    namespace: default
+  functionTimeout: 60
+  idletimeout: 120
+  package:
+    functionName: main.selfie
+    packageref:
+      name: selfie-fn-ad366824-de0f-4c5a-80a7-705d2e7b5764
+      namespace: default
+  requestsPerPod: 10000
+  resources: {}
