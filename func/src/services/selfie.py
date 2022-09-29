@@ -1,6 +1,7 @@
 # Jormungandr - Onboarding
 from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep
 from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
+from ..domain.models.selfie import Selfie
 from ..domain.validators.validator import Base64File
 from ..repositories.s3.repository import FileRepository
 from ..transports.audit.transport import Audit
@@ -27,13 +28,18 @@ class SelfieService:
     @staticmethod
     async def save_user_selfie(selfie_validated: Base64File, unique_id: str) -> bool:
         file_path = f"{unique_id}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
-        await Audit.record_message_log(file_path=file_path, unique_id=unique_id)
+        selfie = Selfie(
+            file_path=file_path,
+            unique_id=unique_id,
+            device_info=selfie_validated.device_info,
+        )
+        await Audit.record_message_log(selfie=selfie)
         temp_file = await SelfieService._resolve_content(
             selfie_validated=selfie_validated
         )
         await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
         await SelfieService._content_exists(file_path=file_path)
-        await BureauApiTransport.create_transaction(unique_id=unique_id)
+        await BureauApiTransport.create_transaction(selfie=selfie)
         return True
 
     @staticmethod
