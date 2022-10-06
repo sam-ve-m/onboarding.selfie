@@ -32,8 +32,7 @@ class DeviceInformation(BaseModel):
         latitude_longitude_precision = geolocation.split(", ")
         if not len(latitude_longitude_precision) == 3:
             raise ValueError(
-                f"Missing Parameters in geolocation: {geolocation}; "
-                + "expected: latitude,longitude,precision."
+                f"Missing Parameters in geolocation: {geolocation}; expected: latitude,longitude,precision."
             )
         request["latitude"], request["longitude"], request["precision"] = (
             map(float, latitude_longitude_precision)
@@ -46,7 +45,7 @@ class Base64File(BaseModel):
     content: str
     device_info: DeviceInformation
 
-    @validator("content", always=True)
+    @validator("content")
     def validate_content(cls, content):
         base_64_regex = r"^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$"
         if match(base_64_regex, content):
