@@ -1,12 +1,15 @@
 # Jormungandr - Onboarding
+import asyncio
+
 from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep
 from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
 from ..domain.models.selfie import Selfie
-from ..domain.validators.validator import Base64File
+from ..domain.validators.validator import SelfieInput
 from ..repositories.mongo_db.user.repository import UserRepository
 from ..repositories.s3.repository import FileRepository
 from ..transports.audit.transport import Audit
 from ..transports.bureau_validation.transport import BureauApiTransport
+from ..transports.device_info.transport import DeviceSecurity
 from ..transports.onboarding_steps.transport import OnboardingSteps
 
 # Standards
@@ -27,26 +30,36 @@ class SelfieService:
         return True
 
     @staticmethod
-    async def save_user_selfie(selfie_validated: Base64File, unique_id: str) -> bool:
+    async def save_user_selfie(selfie_validated: SelfieInput, unique_id: str) -> bool:
         file_path = f"{unique_id}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
+        request_device_info = DeviceSecurity.decrypt_device_info(selfie_validated.device_info)
+        request_device_id = DeviceSecurity.generate_device_id(selfie_validated.device_info)
+        device_info, device_id = await asyncio.gather(request_device_info, request_device_id)
         selfie = Selfie(
             file_path=file_path,
             unique_id=unique_id,
-            device_info=selfie_validated.device_info,
+            device_id=device_id,
+            device_info=device_info,
+            content=selfie_validated.content,
+            latitude=selfie_validated.latitude,
+            longitude=selfie_validated.longitude,
+            precision=selfie_validated.precision,
+            ip_address=selfie_validated.ip_address,
         )
-        await Audit.record_message_log(selfie=selfie)
-        temp_file = await SelfieService._resolve_content(
-            selfie_validated=selfie_validated
-        )
-        await FileRepository.save_user_file(file_path=file_path, temp_file=temp_file)
-        await SelfieService._content_exists(file_path=file_path)
-        await BureauApiTransport.create_transaction(selfie=selfie)
-        await UserRepository.update_one(unique_id=unique_id, update=selfie.user_template())
+        await SelfieService._save_selfie(selfie)
         return True
 
     @staticmethod
-    async def _resolve_content(selfie_validated: Base64File) -> TemporaryFile:
-        content = selfie_validated.content
+    async def _save_selfie(selfie: Selfie):
+        await Audit.record_message_log(selfie=selfie)
+        temp_file = await SelfieService._resolve_content(selfie.content)
+        await FileRepository.save_user_file(file_path=selfie.file_path, temp_file=temp_file)
+        await SelfieService._content_exists(file_path=selfie.file_path)
+        await BureauApiTransport.create_transaction(selfie=selfie)
+        await UserRepository.update_one(unique_id=selfie.unique_id, update=selfie.user_template())
+
+    @staticmethod
+    async def _resolve_content(content: str) -> TemporaryFile:
         decoded_selfie = b64decode(content)
         temp_file = TemporaryFile()
         temp_file.write(decoded_selfie)

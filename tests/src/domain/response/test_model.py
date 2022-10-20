@@ -7,3 +7,4 @@ def test_instance(mocked_dumps):
     dummy_value = MagicMock()
     model = ResponseModel(dummy_value, dummy_value)
     assert model.message is None
+    assert model.result is None

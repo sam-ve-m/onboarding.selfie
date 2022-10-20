@@ -69,6 +69,8 @@ spec:
               value: "dtvm-terms-uat"
             - name: ONBOARDING_STEPS_BR_URL
               value: "http://router.fission.svc.cluster.local/onboarding/steps_br"
+            - name: DEVICE_SECURITY_DEVICE_ID_URL
+              value: "http://router.fission.svc.cluster.local/security/deviceid"
             - name: IARA_KAFKA_BROKERS
               value: "cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
   version: 3

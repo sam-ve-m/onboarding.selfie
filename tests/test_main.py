@@ -97,7 +97,7 @@ exception_case = (
 @patch.object(SelfieService, "save_user_selfie")
 @patch.object(Gladsheim, "error")
 @patch.object(JwtService, "decode_jwt_and_get_unique_id")
-@patch.object(Base64File, "from_request", return_value=None)
+@patch.object(Base64File, "__init__", return_value=None)
 @patch.object(ResponseModel, "__init__", return_value=None)
 @patch.object(ResponseModel, "build_http_response")
 async def test_selfie_raising_errors(
@@ -126,7 +126,7 @@ dummy_response = "response"
 @patch.object(SelfieService, "save_user_selfie", return_value=dummy_response)
 @patch.object(Gladsheim, "error")
 @patch.object(JwtService, "decode_jwt_and_get_unique_id")
-@patch.object(Base64File, "from_request", return_value=None)
+@patch.object(Base64File, "__init__", return_value=None)
 @patch.object(ResponseModel, "__init__", return_value=None)
 @patch.object(ResponseModel, "build_http_response", return_value=dummy_response)
 async def test_selfie(
