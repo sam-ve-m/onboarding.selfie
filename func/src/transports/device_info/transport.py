@@ -7,7 +7,7 @@ from http import HTTPStatus
 # Third party
 from httpx import AsyncClient
 from decouple import config
-
+from etria_logger import Gladsheim
 from ...domain.validators.validator import DeviceInformation
 
 
@@ -20,6 +20,11 @@ class DeviceSecurity:
                 config("DEVICE_SECURITY_DECRYPT_DEVICE_INFO_URL"), json=body
             )
             if not request_result.status_code == HTTPStatus.OK:
+                Gladsheim.error(
+                    message=DeviceSecurityDecryptDeviceInfo.msg,
+                    status=request_result.status_code,
+                    content=request_result.content
+                )
                 raise DeviceSecurityDecryptDeviceInfo()
         raw_device_info = (
             request_result.json().get("deviceInfo")
@@ -35,6 +40,11 @@ class DeviceSecurity:
                 config("DEVICE_SECURITY_DEVICE_ID_URL"), json=body
             )
             if not request_result.status_code == HTTPStatus.OK:
+                Gladsheim.error(
+                    message=DeviceSecurityDeviceId.msg,
+                    status=request_result.status_code,
+                    content=request_result.content
+                )
                 raise DeviceSecurityDeviceId()
         device_id = (
             request_result.json().get("deviceID")

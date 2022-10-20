@@ -29,7 +29,7 @@ async def selfie() -> flask.Response:
     try:
         selfie_validated = SelfieInput(**raw_selfie)
         unique_id = await JwtService.decode_jwt_and_get_unique_id(jwt=jwt)
-        # await SelfieService.validate_current_onboarding_step(jwt=jwt)
+        await SelfieService.validate_current_onboarding_step(jwt=jwt)
         success = await SelfieService.save_user_selfie(
             selfie_validated=selfie_validated, unique_id=unique_id
         )
