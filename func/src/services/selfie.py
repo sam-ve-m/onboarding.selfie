@@ -22,6 +22,8 @@ from decouple import config
 
 
 class SelfieService:
+    _selfie_file_path_end = f"{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
+
     @staticmethod
     async def validate_current_onboarding_step(jwt: str) -> bool:
         user_current_step = await OnboardingSteps.get_user_current_step(jwt=jwt)
@@ -31,7 +33,7 @@ class SelfieService:
 
     @staticmethod
     async def save_user_selfie(selfie_validated: SelfieInput, unique_id: str) -> bool:
-        file_path = f"{unique_id}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
+        file_path = "/".join((unique_id, SelfieService._selfie_file_path_end))
         request_device_info = DeviceSecurity.decrypt_device_info(selfie_validated.device_info)
         request_device_id = DeviceSecurity.generate_device_id(selfie_validated.device_info)
         device_info, device_id = await asyncio.gather(request_device_info, request_device_id)
@@ -69,6 +71,6 @@ class SelfieService:
     @staticmethod
     async def _content_exists(file_path: str) -> bool:
         content_result = await FileRepository.list_contents(file_path=file_path)
-        if content_result is None or config("CONTENTS") not in content_result:
+        if SelfieService._selfie_file_path_end not in str(content_result):
             raise SelfieNotExists
         return True

@@ -19,39 +19,30 @@ with patch.object(AutoConfig, "__init__"):
 
 
 @pytest.mark.asyncio
-@patch.object(AutoConfig, "__call__", return_value="Contents")
 @patch(
     "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
 )
-async def test_when_content_exists_then_return_true(mock_list_contents, mocked_env):
+async def test_when_content_exists_then_return_true(mock_list_contents, monkeypatch):
+    monkeypatch.setattr(SelfieService, "_selfie_file_path_end", "Contents")
     result = await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
-
     assert result is True
 
 
 @pytest.mark.asyncio
-@patch.object(AutoConfig, "__call__", return_value="Contents")
 @patch(
     "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
 )
-async def test_when_content_exists_then_proceed(mock_list_contents, mocked_env):
+async def test_when_content_exists_then_proceed(mock_list_contents, monkeypatch):
+    monkeypatch.setattr(SelfieService, "_selfie_file_path_end", "Contents")
     await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 
     mock_list_contents.assert_called_once_with(file_path="path/path/user_selfie.jpg")
 
 
 @pytest.mark.asyncio
-@patch.object(AutoConfig, "__call__")
-@patch("func.src.services.selfie.FileRepository.list_contents", return_value=None)
-async def test_when_content_not_exists_then_raises(mock_list_contents, mocked_env):
-    with pytest.raises(SelfieNotExists):
-        await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
-
-
-@pytest.mark.asyncio
-@patch.object(AutoConfig, "__call__")
-@patch("func.src.services.selfie.FileRepository.list_contents", return_value={})
-async def test_when_return_empty_dict_then_raises(mock_list_contents, mocked_env):
+@patch("func.src.services.selfie.FileRepository.list_contents", return_value=stub_content)
+async def test_when_return_empty_dict_then_raises(mock_list_contents, monkeypatch):
+    monkeypatch.setattr(SelfieService, "_selfie_file_path_end", "Wrong")
     with pytest.raises(SelfieNotExists):
         await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 
@@ -69,7 +60,7 @@ async def test_save_user_selfie(
     mocked_transport_for_info
 ):
     result = await SelfieService.save_user_selfie(
-        selfie_validated=dummy_value, unique_id=dummy_value
+        selfie_validated=dummy_value, unique_id=str(dummy_value)
     )
     file_path = f"{dummy_value}/{UserFileType.SELFIE}/{UserFileType.SELFIE}{FileExtensionType.SELFIE_EXTENSION}"
 
@@ -77,7 +68,7 @@ async def test_save_user_selfie(
     mocked_transport_for_info.assert_called_once_with(dummy_value.device_info)
     mocked_model.assert_called_once_with(
         file_path=file_path,
-        unique_id=dummy_value,
+        unique_id=str(dummy_value),
         device_id=mocked_transport_for_id.return_value,
         device_info=mocked_transport_for_info.return_value,
         content=dummy_value.content,
