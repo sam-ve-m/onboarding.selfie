@@ -1,7 +1,6 @@
 # Jormungandr - Onboarding
 from func.src.domain.exceptions.exceptions import ErrorOnSendAuditLog
 from func.src.transports.audit.transport import Audit
-from tests.src.services.selfie.stubs import stub_unique_id
 
 # Standards
 from unittest.mock import patch, MagicMock

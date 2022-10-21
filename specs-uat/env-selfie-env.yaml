@@ -73,4 +73,6 @@ spec:
               value: "http://router.fission.svc.cluster.local/security/deviceid"
             - name: IARA_KAFKA_BROKERS
               value: "cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+            - name: DEFAULT_PRECISION_VALUE
+              value: 1
   version: 3

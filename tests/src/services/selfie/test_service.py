@@ -1,56 +1,57 @@
-# Jormungandr - Onboarding
-from func.src.domain.exceptions.exceptions import (
-    SelfieNotExists,
-    ErrorOnSendAuditLog,
-    InvalidOnboardingCurrentStep,
-)
-from func.src.services.selfie import SelfieService
-from func.src.transports.bureau_validation.transport import BureauApiTransport
-from func.src.repositories.mongo_db.user.repository import UserRepository
-from func.src.domain.enums.types import UserFileType, FileExtensionType
-from func.src.domain.models.selfie import Selfie
-from func.src.transports.device_info.transport import DeviceSecurity
-from tests.src.services.selfie.image import dummy_b64
-from tests.src.services.selfie.stubs import stub_content, stub_unique_id, stub_b64_file
-
-# Standards
-from unittest.mock import patch, MagicMock
 from io import BufferedRandom
-
-# Third party
+from unittest.mock import patch, MagicMock
+from decouple import AutoConfig
 import pytest
 
 
+with patch.object(AutoConfig, "__init__"):
+    with patch.object(AutoConfig, "__call__"):
+        from func.src.domain.enums.types import UserFileType, FileExtensionType
+        from func.src.domain.exceptions.exceptions import (
+            SelfieNotExists,
+            InvalidOnboardingCurrentStep,
+        )
+        from func.src.domain.models.selfie import Selfie
+        from func.src.services.selfie import SelfieService
+        from func.src.transports.device_info.transport import DeviceSecurity
+        from tests.src.services.selfie.image import dummy_b64
+        from tests.src.services.selfie.stubs import stub_content
+
+
 @pytest.mark.asyncio
+@patch.object(AutoConfig, "__call__", return_value="Contents")
 @patch(
     "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
 )
-async def test_when_content_exists_then_return_true(mock_list_contents):
+async def test_when_content_exists_then_return_true(mock_list_contents, mocked_env):
     result = await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 
     assert result is True
 
 
 @pytest.mark.asyncio
+@patch.object(AutoConfig, "__call__", return_value="Contents")
 @patch(
     "func.src.services.selfie.FileRepository.list_contents", return_value=stub_content
 )
-async def test_when_content_exists_then_proceed(mock_list_contents):
+async def test_when_content_exists_then_proceed(mock_list_contents, mocked_env):
     await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 
     mock_list_contents.assert_called_once_with(file_path="path/path/user_selfie.jpg")
 
 
 @pytest.mark.asyncio
+@patch.object(AutoConfig, "__call__")
 @patch("func.src.services.selfie.FileRepository.list_contents", return_value=None)
-async def test_when_content_not_exists_then_raises(mock_list_contents):
+async def test_when_content_not_exists_then_raises(mock_list_contents, mocked_env):
     with pytest.raises(SelfieNotExists):
         await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 
 
 @pytest.mark.asyncio
+@patch.object(AutoConfig, "__call__")
 @patch("func.src.services.selfie.FileRepository.list_contents", return_value={})
-async def test_when_return_empty_dict_then_raises(mock_list_contents):
+async def test_when_return_empty_dict_then_raises(mock_list_contents, mocked_env):
     with pytest.raises(SelfieNotExists):
         await SelfieService._content_exists(file_path="path/path/user_selfie.jpg")
 

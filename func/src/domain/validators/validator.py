@@ -3,13 +3,14 @@ from pydantic import BaseModel, validator
 
 # Standards
 from re import match
+from decouple import config
 
 
 class SelfieInput(BaseModel):
     device_info: str
     latitude: float
     longitude: float
-    precision: float
+    precision: float = float(config("DEFAULT_PRECISION_VALUE"))
     ip_address: str
     content: str
 

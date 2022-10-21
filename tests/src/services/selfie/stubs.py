@@ -1,4 +1,8 @@
-from func.src.domain.validators.validator import SelfieInput
+from unittest.mock import patch
+from decouple import AutoConfig
+
+with patch.object(AutoConfig, "__call__"):
+    from func.src.domain.validators.validator import SelfieInput
 from tests.src.services.selfie.image import payload_b64_file
 
 stub_content = {"Contents": {"test": "test"}}
