@@ -21,6 +21,14 @@ class OnboardingStepsStatusCodeNotOk(Exception):
     msg = "Jormungandr-Onboarding::get_user_current_step::Error when trying to get onboarding steps br"
 
 
+class DeviceSecurityDeviceId(Exception):
+    msg = "Jormungandr-Onboarding::generate_device_id::Unable to generate a device id"
+
+
+class DeviceSecurityDecryptDeviceInfo(Exception):
+    msg = "Jormungandr-Onboarding::generate_device_id::Unable to decrypt a device information"
+
+
 class InvalidOnboardingCurrentStep(Exception):
     msg = "Jormungandr-Onboarding::validate_current_onboarding_step::User is not in the electronic signature step"
 

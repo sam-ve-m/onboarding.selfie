@@ -22,3 +22,7 @@ class FileExtensionType(StrEnum):
 
 class UserOnboardingStep(StrEnum):
     SELFIE = "selfie"
+
+
+class CpfValidationStatus(StrEnum):
+    QUEUED = "QUEUED"

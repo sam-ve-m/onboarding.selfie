@@ -10,16 +10,18 @@ from flask import Response
 
 class ResponseModel:
     def __init__(
-        self, success: bool, code: InternalCode, message: str = None
+        self, success: bool, code: InternalCode, message: str = None, result: str = None
     ):
         self.success = success
         self.code = code
         self.message = message
+        self.result = result
         self.response = self.to_dumps()
 
     def to_dumps(self) -> str:
         response_model = dumps(
             {
+                "result": self.result,
                 "message": self.message,
                 "success": self.success,
                 "code": self.code,

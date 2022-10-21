@@ -18,7 +18,7 @@ class OnboardingSteps:
                 config("ONBOARDING_STEPS_BR_URL"), headers=headers
             )
             if not request_result.status_code == HTTPStatus.OK:
-                raise OnboardingStepsStatusCodeNotOk
+                raise OnboardingStepsStatusCodeNotOk()
         user_current_step = (
             request_result.json().get("result", {}).get("current_step")
         )
