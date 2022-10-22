@@ -1,21 +1,17 @@
-# Jormungandr - Onboarding
-from ...domain.exceptions.exceptions import ErrorOnSendAuditLog
-from ...domain.enums.types import QueueTypes
-
-# Third party
 from decouple import config
 from persephone_client import Persephone
+
+from ...domain.enums.types import QueueTypes
+from ...domain.exceptions.exceptions import ErrorOnSendAuditLog
+from ...domain.models.selfie import Selfie
 
 
 class Audit:
     audit_client = Persephone
 
     @classmethod
-    async def record_message_log(cls, unique_id: str, file_path: str):
-        message = {
-            "unique_id": unique_id,
-            "file_path": file_path,
-        }
+    async def record_message_log(cls, selfie: Selfie):
+        message = selfie.audit_template()
         partition = QueueTypes.USER_SELFIE
         topic = config("PERSEPHONE_TOPIC_USER")
         schema_name = config("PERSEPHONE_USER_SELFIE")

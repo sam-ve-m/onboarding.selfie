@@ -18,7 +18,7 @@ spec:
     container:
       name: ""
       resources: {}
-    image: nexus.sigame.com.br/fission-async:0.1.6
+    image: nexus.sigame.com.br/fission-async:0.1.7
     podspec:
       containers:
         - name: selfie-env
@@ -69,4 +69,10 @@ spec:
               value: "dtvm-terms-uat"
             - name: ONBOARDING_STEPS_BR_URL
               value: "http://router.fission.svc.cluster.local/onboarding/steps_br"
+            - name: DEVICE_SECURITY_DEVICE_ID_URL
+              value: "http://router.fission.svc.cluster.local/security/deviceid"
+            - name: IARA_KAFKA_BROKERS
+              value: "cluster-kafka-bootstrap.kafka.svc.cluster.local:9092"
+            - name: DEFAULT_PRECISION_VALUE
+              value: 1
   version: 3

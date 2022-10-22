@@ -18,7 +18,7 @@ with patch.object(RepositoryEnv, "__init__", return_value=None):
                 from src.services.jwt import JwtService
                 from src.domain.enums.code import InternalCode
                 from src.domain.response.model import ResponseModel
-                from src.domain.validators.validator import Base64File
+                from src.domain.validators.validator import SelfieInput
                 from src.domain.exceptions.exceptions import ErrorOnDecodeJwt, ErrorOnSendAuditLog, SelfieNotExists, OnboardingStepsStatusCodeNotOk, InvalidOnboardingCurrentStep, ErrorOnGetUniqueId
                 from src.services.selfie import SelfieService
 
@@ -97,7 +97,7 @@ exception_case = (
 @patch.object(SelfieService, "save_user_selfie")
 @patch.object(Gladsheim, "error")
 @patch.object(JwtService, "decode_jwt_and_get_unique_id")
-@patch.object(Base64File, "__init__", return_value=None)
+@patch.object(SelfieInput, "__init__", return_value=None)
 @patch.object(ResponseModel, "__init__", return_value=None)
 @patch.object(ResponseModel, "build_http_response")
 async def test_selfie_raising_errors(
@@ -126,7 +126,7 @@ dummy_response = "response"
 @patch.object(SelfieService, "save_user_selfie", return_value=dummy_response)
 @patch.object(Gladsheim, "error")
 @patch.object(JwtService, "decode_jwt_and_get_unique_id")
-@patch.object(Base64File, "__init__", return_value=None)
+@patch.object(SelfieInput, "__init__", return_value=None)
 @patch.object(ResponseModel, "__init__", return_value=None)
 @patch.object(ResponseModel, "build_http_response", return_value=dummy_response)
 async def test_selfie(
@@ -137,6 +137,7 @@ async def test_selfie(
     response = await selfie()
     mocked_jwt_decode.assert_called()
     mocked_service.assert_called()
+    mocked_validation.assert_called()
     mocked_logger.assert_not_called()
     mocked_response_instance.assert_called_once_with(
         success=dummy_response,
