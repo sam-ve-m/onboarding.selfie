@@ -6,16 +6,17 @@ import pytest
 
 with patch.object(AutoConfig, "__init__"):
     with patch.object(AutoConfig, "__call__"):
-        from func.src.domain.enums.types import UserFileType, FileExtensionType
+        from func.src.domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep, UserAntiFraudStatus
         from func.src.domain.exceptions.exceptions import (
             SelfieNotExists,
-            InvalidOnboardingCurrentStep,
-        )
+            InvalidOnboardingCurrentStep, InvalidOnboardingAntiFraud,
+)
         from func.src.domain.models.selfie import Selfie
         from func.src.services.selfie import SelfieService
         from func.src.transports.device_info.transport import DeviceSecurity
         from tests.src.services.selfie.image import dummy_b64
         from tests.src.services.selfie.stubs import stub_content
+        from func.src.transports.onboarding_steps.transport import OnboardingSteps
 
 
 @pytest.mark.asyncio
@@ -89,21 +90,29 @@ async def test_when_image_as_str_then_return_temp_file():
 
 
 @pytest.mark.asyncio
-@patch(
-    "func.src.services.selfie.OnboardingSteps.get_user_current_step",
-    return_value="selfie",
-)
-async def test_when_current_step_correct_then_return_true(mock_onboarding_steps):
-    result = await SelfieService.validate_current_onboarding_step(jwt="123")
-
-    assert result is True
+@patch.object(OnboardingSteps, "get_user_current_step")
+async def test_validate_current_onboarding_step_invalid_step(mocked_transport):
+    mocked_transport.return_value.step = None
+    with pytest.raises(InvalidOnboardingCurrentStep):
+        await SelfieService.validate_current_onboarding_step(dummy_value)
+    mocked_transport.assert_called_once_with(jwt=dummy_value)
 
 
 @pytest.mark.asyncio
-@patch(
-    "func.src.services.selfie.OnboardingSteps.get_user_current_step",
-    return_value="finished",
-)
-async def test_when_current_step_invalid_then_return_raises(mock_onboarding_steps):
-    with pytest.raises(InvalidOnboardingCurrentStep):
-        await SelfieService.validate_current_onboarding_step(jwt="123")
+@patch.object(OnboardingSteps, "get_user_current_step")
+async def test_validate_current_onboarding_step_invalid_anti_fraud(mocked_transport):
+    mocked_transport.return_value.step = UserOnboardingStep.SELFIE
+    mocked_transport.return_value.anti_fraud = UserAntiFraudStatus.REPROVED
+    with pytest.raises(InvalidOnboardingAntiFraud):
+        await SelfieService.validate_current_onboarding_step(dummy_value)
+    mocked_transport.assert_called_once_with(jwt=dummy_value)
+
+
+@pytest.mark.asyncio
+@patch.object(OnboardingSteps, "get_user_current_step")
+async def test_validate_current_onboarding_step(mocked_transport):
+    mocked_transport.return_value.step = UserOnboardingStep.SELFIE
+    mocked_transport.return_value.anti_fraud = None
+    result = await SelfieService.validate_current_onboarding_step(dummy_value)
+    mocked_transport.assert_called_once_with(jwt=dummy_value)
+    assert result is True
