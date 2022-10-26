@@ -30,7 +30,11 @@ class DeviceSecurityDecryptDeviceInfo(Exception):
 
 
 class InvalidOnboardingCurrentStep(Exception):
-    msg = "Jormungandr-Onboarding::validate_current_onboarding_step::User is not in the electronic signature step"
+    msg = "Jormungandr-Onboarding::validate_current_onboarding_step::User is in the {} step"
+
+
+class InvalidOnboardingAntiFraud(Exception):
+    msg = "Jormungandr-Onboarding::validate_current_onboarding_step::User rejected by anti fraud"
 
 
 class ErrorOnGetUniqueId(Exception):

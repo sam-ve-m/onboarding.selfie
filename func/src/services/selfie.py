@@ -1,8 +1,8 @@
 # Jormungandr - Onboarding
 import asyncio
 
-from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep
-from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep
+from ..domain.enums.types import UserFileType, FileExtensionType, UserOnboardingStep, UserAntiFraudStatus
+from ..domain.exceptions.exceptions import SelfieNotExists, InvalidOnboardingCurrentStep, InvalidOnboardingAntiFraud
 from ..domain.models.selfie import Selfie
 from ..domain.validators.validator import SelfieInput
 from ..repositories.mongo_db.user.repository import UserRepository
@@ -12,13 +12,9 @@ from ..transports.bureau_validation.transport import BureauApiTransport
 from ..transports.device_info.transport import DeviceSecurity
 from ..transports.onboarding_steps.transport import OnboardingSteps
 
-# Standards
 from base64 import b64decode
 from io import SEEK_SET
 from tempfile import TemporaryFile
-
-# Third party
-from decouple import config
 
 
 class SelfieService:
@@ -27,8 +23,10 @@ class SelfieService:
     @staticmethod
     async def validate_current_onboarding_step(jwt: str) -> bool:
         user_current_step = await OnboardingSteps.get_user_current_step(jwt=jwt)
-        if not user_current_step == UserOnboardingStep.SELFIE:
-            raise InvalidOnboardingCurrentStep
+        if not user_current_step.step == UserOnboardingStep.SELFIE:
+            raise InvalidOnboardingCurrentStep(user_current_step)
+        if user_current_step.anti_fraud == UserAntiFraudStatus.REPROVED:
+            raise InvalidOnboardingAntiFraud()
         return True
 
     @staticmethod

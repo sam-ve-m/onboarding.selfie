@@ -19,7 +19,8 @@ with patch.object(RepositoryEnv, "__init__", return_value=None):
                 from src.domain.enums.code import InternalCode
                 from src.domain.response.model import ResponseModel
                 from src.domain.validators.validator import SelfieInput
-                from src.domain.exceptions.exceptions import ErrorOnDecodeJwt, ErrorOnSendAuditLog, SelfieNotExists, OnboardingStepsStatusCodeNotOk, InvalidOnboardingCurrentStep, ErrorOnGetUniqueId
+                from src.domain.exceptions.exceptions import ErrorOnDecodeJwt, ErrorOnSendAuditLog, SelfieNotExists, \
+    OnboardingStepsStatusCodeNotOk, InvalidOnboardingCurrentStep, ErrorOnGetUniqueId, InvalidOnboardingAntiFraud
                 from src.services.selfie import SelfieService
 
 
@@ -52,11 +53,18 @@ onboarding_steps_status_code_not_ok_case = (
     HTTPStatus.INTERNAL_SERVER_ERROR
 )
 invalid_onboarding_current_step_case = (
-    InvalidOnboardingCurrentStep(),
-    InvalidOnboardingCurrentStep.msg,
+    InvalidOnboardingCurrentStep("step"),
+    InvalidOnboardingCurrentStep.msg.format("step"),
     InternalCode.ONBOARDING_STEP_INCORRECT,
     "User is not in correct step",
     HTTPStatus.BAD_REQUEST
+)
+invalid_onboarding_anti_fraud_case = (
+    InvalidOnboardingAntiFraud(),
+    InvalidOnboardingAntiFraud.msg,
+    InternalCode.ONBOARDING_STEP_INCORRECT,
+    "User not approved",
+    HTTPStatus.FORBIDDEN
 )
 error_on_get_unique_id_case = (
     ErrorOnGetUniqueId(),
@@ -90,6 +98,7 @@ exception_case = (
     onboarding_steps_status_code_not_ok_case,
     invalid_onboarding_current_step_case,
     error_on_get_unique_id_case,
+    invalid_onboarding_anti_fraud_case,
     value_exception_case,
     exception_case,
 ])

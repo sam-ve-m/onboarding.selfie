@@ -24,5 +24,9 @@ class UserOnboardingStep(StrEnum):
     SELFIE = "selfie"
 
 
+class UserAntiFraudStatus(StrEnum):
+    REPROVED = "reproved"
+
+
 class CpfValidationStatus(StrEnum):
     QUEUED = "QUEUED"
