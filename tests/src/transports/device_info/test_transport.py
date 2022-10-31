@@ -9,7 +9,6 @@ from etria_logger import Gladsheim
 from httpx import AsyncClient
 
 from src.domain.exceptions.exceptions import DeviceSecurityDecryptDeviceInfo, DeviceSecurityDeviceId
-from src.domain.validators.validator import DeviceInformation
 from src.transports.device_info.transport import DeviceSecurity
 
 
@@ -82,9 +81,7 @@ async def test_generate_device_id_with_error(
 @patch.object(AsyncClient, "__aexit__")
 @patch.object(Config, "__call__")
 @patch.object(Gladsheim, "error")
-@patch.object(DeviceInformation, "__init__", return_value=None)
 async def test_decrypt_device_info(
-        mocked_model,
         mocked_logger,
         mocked_env,
         mocked_client_exit,
@@ -99,7 +96,6 @@ async def test_decrypt_device_info(
         mocked_env.return_value, json={"deviceInfo": dummy_value}
     )
     mocked_logger.assert_not_called()
-    mocked_model.assert_called_once()
     (
         mocked_client_enter.return_value.post.
         return_value.json.return_value
@@ -117,9 +113,7 @@ def raise_second(*args):
 @patch.object(AsyncClient, "__aexit__", side_effect=raise_second)
 @patch.object(Config, "__call__")
 @patch.object(Gladsheim, "error")
-@patch.object(DeviceInformation, "__init__", return_value=None)
 async def test_decrypt_device_info_with_error(
-        mocked_model,
         mocked_logger,
         mocked_env,
         mocked_client_exit,
@@ -139,5 +133,4 @@ async def test_decrypt_device_info_with_error(
         status=mocked_client_enter.return_value.post.return_value.status_code,
         content=mocked_client_enter.return_value.post.return_value.content
     )
-    mocked_model.assert_not_called()
 
