@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
 from src.domain.enums.types import CpfValidationStatus
-from src.domain.validators.validator import DeviceInformation
 
 
 @dataclass
@@ -14,14 +13,14 @@ class Selfie:
     latitude: float
     longitude: float
     precision: float
-    device_info: DeviceInformation
+    device_info: dict
 
     def audit_template(self) -> dict:
         template = {
             "file_path": self.file_path,
             "unique_id": self.unique_id,
             "device_id": self.device_id,
-            "device_info": self.device_info.dict(),
+            "device_info": self.device_info,
             "geolocation": f"{self.latitude}, {self.longitude}, {self.precision}",
             "ip_address": self.ip_address,
         }
@@ -30,7 +29,7 @@ class Selfie:
     def bureau_callback_template(self) -> dict:
         template = {
             "unique_id": self.unique_id,
-            "device_info": self.device_info.dict(),
+            "device_info": self.device_info,
             "device_id": self.device_id,
             "latitude": self.latitude,
             "longitude": self.longitude,
