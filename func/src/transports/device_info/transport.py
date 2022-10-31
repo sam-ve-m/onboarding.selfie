@@ -8,12 +8,11 @@ from http import HTTPStatus
 from httpx import AsyncClient
 from decouple import config
 from etria_logger import Gladsheim
-from ...domain.validators.validator import DeviceInformation
 
 
 class DeviceSecurity:
     @staticmethod
-    async def decrypt_device_info(device_info: str) -> DeviceInformation:
+    async def decrypt_device_info(device_info: str) -> dict:
         body = {"deviceInfo": device_info}
         async with AsyncClient() as httpx_client:
             request_result = await httpx_client.post(
@@ -26,11 +25,10 @@ class DeviceSecurity:
                     content=request_result.content
                 )
                 raise DeviceSecurityDecryptDeviceInfo()
-        raw_device_info = (
+        device_info_decrypted = (
             request_result.json().get("deviceInfo")
         )
-        device_info_model = DeviceInformation(**raw_device_info)
-        return device_info_model
+        return device_info_decrypted
 
     @staticmethod
     async def generate_device_id(device_info: str) -> str:
